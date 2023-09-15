@@ -87,6 +87,10 @@
 
     const oldComments = commentsElement.innerHTML; // Получили HTML списка с комментариями
     let date = new Date(); // Получили дату
+    let month = date.getMonth() + 1;
+    if (month < 10) {
+      month = "0" + month
+    };
 
     // Добавляем новый комментарий
 
@@ -94,7 +98,7 @@
     `<li class="comment">
           <div class="comment-header">
             <div>${nameInputElement.value}</div>
-            <div>${date.getDate()}.${date.getMonth()}.${date.getFullYear() - 2000} ${date.getHours()}:${date.getMinutes()}</div>
+            <div>${date.getDate()}.${month}.${date.getFullYear() - 2000} ${date.getHours()}:${date.getMinutes()}</div>
           </div>
           <div class="comment-body">
             <div class="comment-text">

@@ -61,6 +61,7 @@ body {
   }
 
   .comment-text {
+    word-break: break-all;
     font-size: 32px;
   }
 
@@ -149,4 +150,6 @@ body {
   .delete-comment-button {
     opacity: 0.9;
   }
+  
+  
   

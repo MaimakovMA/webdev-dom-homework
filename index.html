@@ -63,6 +63,29 @@
       }, 
     ];
 
+
+
+    // Запрос API
+    
+    const fetchPromise = fetch("https://wedev-api.sky.pro/api/v1/mikhail-maimakov/comments", {
+      method: "GET"
+    });
+
+
+    // С помощью метода then мы подписываемся на ответ сервера
+
+    fetchPromise.then((response) => {
+      // Переводим данные от API в json формат
+      response.json().then((responseData) => {
+        // Получили данные и рендерим
+        commentsArray = responseData.comments
+          console.log(commentsArray); 
+          renderList();
+      });
+    });
+
+
+
     // Функция при нажатии на лайк
 
     const likeListeners = () => {
@@ -107,9 +130,10 @@
     // Создем рендер списка на основе массива 
     const renderList = () => {
       const commentsHtml = commentsArray.map((comment, index) => {
+
         return `<li class="comment">
           <div class="comment-header">
-            <div class="comment-name" data-index="${index}">${comment.name}</div>
+            <div class="comment-name" data-index="${index}">${comment.author.name}</div>
             <div>${comment.date}</div>
           </div>
           <div class="comment-body">
@@ -142,6 +166,27 @@
         formInputElement.classList.add("add__form_error");
         return;
       };    
+
+
+    
+
+    //  Отправляем новый объект на сервер
+
+    const fetchPromise = fetch("https://wedev-api.sky.pro/api/v1/mikhail-maimakov/comments", {
+      method: "POST",
+      body: JSON.stringify({
+            text: commentInputElement.value,
+            name: nameInputElement.value,
+          })
+    }).then((response) => {
+      // Переводим данные от API в json формат
+      response.json().then((responseData) => {
+        // Получили данные и рендерим
+        commentsArray = responseData.comments
+          
+        renderList();
+      });
+    });
 
         
     // Получили дату

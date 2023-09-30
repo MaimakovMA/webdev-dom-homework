@@ -44,24 +44,29 @@
    const commentInputElement = document.querySelector(".add-form-text");
    const buttonInputElement = document.querySelector(".add-form-button");
 
-  //  Создаем массив данных данных с комментариями
+  
+    // Получили дату
+    
+    let date = new Date(); 
+      
+      let month = date.getMonth() + 1 ;
+        if (month < 10) {
+          month = "0" + month
+        };
 
-    const commentsArray = [
-    {
-        name: "Глеб Фокин",
-        comment: "Это будет первый комментарий на этой странице",
-        likes: 3,
-        date: '12.02.22 12:18',
-        activeLike: false,
-      }, 
-      {
-        name: "Варвара Н.",
-        comment: "Мне нравится как оформлена эта страница! ❤",
-        likes: 75,
-        date: '13.02.22 19:22',
-        activeLike: false,
-      }, 
-    ];
+      let minutes = date.getMinutes()
+      if (minutes < 10) {
+          minutes = "0" + minutes
+        };
+
+      let dateString = `${date.getDate()}.${month}.${date.getFullYear() - 2000} ${date.getHours()}:${minutes}`;
+
+  
+  
+  
+   //  Создаем массив данных данных с комментариями
+
+    let commentsArray = [];
 
 
 
@@ -94,11 +99,11 @@
         like.addEventListener("click", (event) => {
           event.stopPropagation();
           const index = like.dataset.index;
-          if (commentsArray[index].activeLike === false) {
-            commentsArray[index].activeLike = true;
+          if (commentsArray[index].isLiked === false) {
+            commentsArray[index].isLiked = true;
             commentsArray[index].likes++;
           } else {
-            commentsArray[index].activeLike = false;
+            commentsArray[index].isLiked = false;
             commentsArray[index].likes--;
           }
           renderList();
@@ -122,7 +127,7 @@
 
     // Функия для закрашивания лайка в зависимости от значения activeLike
     const activeLike = (comment) => {
-        if (comment.activeLike === true) {
+        if (comment.isLiked === true) {
           return '-active-like'
         } 
     };
@@ -134,16 +139,15 @@
         return `<li class="comment">
           <div class="comment-header">
             <div class="comment-name" data-index="${index}">${comment.author.name}</div>
-            <div>${comment.date}</div>
+            <div>${new Date(comment.date)}</div>
           </div>
           <div class="comment-body">
             <div class="comment-text" data-index="${index}">
-              ${comment.comment}
-            </div>
-            
+              ${comment.text}
+            </div>            
           </div>
           <div class="comment-footer">
-              <div class="likes">
+            <div class="likes">
               <span class="likes-counter">${comment.likes}</span>
               <button class="like-button ${activeLike(comment)}" data-index="${index}"></button>
             </div>
@@ -156,7 +160,14 @@
       answerComment();
     };
     
+    // Enter на кнопку "Написать"
+      const enterListener = commentInputElement.addEventListener("keyup", () => {
+      if (event.keyCode === 13) {
+          buttonInputElement.click();
+        }
+      });
 
+    
     // Функция после клика на кнопку "Написать"
 
     buttonInputElement.addEventListener("click", () => {
@@ -167,12 +178,9 @@
         return;
       };    
 
-
-    
-
     //  Отправляем новый объект на сервер
 
-    const fetchPromise = fetch("https://wedev-api.sky.pro/api/v1/mikhail-maimakov/comments", {
+    fetch("https://wedev-api.sky.pro/api/v1/mikhail-maimakov/comments", {
       method: "POST",
       body: JSON.stringify({
             text: commentInputElement.value,
@@ -182,56 +190,19 @@
       // Переводим данные от API в json формат
       response.json().then((responseData) => {
         // Получили данные и рендерим
-        commentsArray = responseData.comments
+        commentsArray = responseData.comments;
           
         renderList();
       });
     });
-
-        
-    // Получили дату
+ 
     
-    let date = new Date(); 
+    //Очищаем форму от последнего комментария
     
-    let month = date.getMonth() + 1 ;
-      if (month < 10) {
-        month = "0" + month
-      };
-
-    let minutes = date.getMinutes()
-    if (minutes < 10) {
-        minutes = "0" + minutes
-      };
-
-    let dateString = `${date.getDate()}.${month}.${date.getFullYear() - 2000} ${date.getHours()}:${minutes}`;
-
-    
-     //Добавили новый объект в массив
-    commentsArray.push({
-      name: nameInputElement.value
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;"),
-      comment: commentInputElement.value
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;"),
-      likes: 0,
-      date: dateString,
-      activeLike: false,
-    });
-
-
-      //Очищаем форму от последнего комментария
       nameInputElement.value = '';
       commentInputElement.value = '';
 
-      // Рендерим новый список
-
-      renderList();
-    });
+  });
 
 
     // Функция после клика на кнопку "Удалить"

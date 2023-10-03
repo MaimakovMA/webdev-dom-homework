@@ -47,7 +47,7 @@
   
     // Получили дату
     
-    let date = new Date(); 
+    function dateFormat(date) {
       
       let month = date.getMonth() + 1 ;
         if (month < 10) {
@@ -59,8 +59,13 @@
           minutes = "0" + minutes
         };
 
-      let dateString = `${date.getDate()}.${month}.${date.getFullYear() - 2000} ${date.getHours()}:${minutes}`;
+        let day = date.getDate()
+      if (day < 10) {
+          day = "0" + day
+        };
 
+      return `${day}.${month}.${date.getFullYear() - 2000} ${date.getHours()}:${minutes}`;
+    }
   
   
   
@@ -139,7 +144,7 @@
         return `<li class="comment">
           <div class="comment-header">
             <div class="comment-name" data-index="${index}">${comment.author.name}</div>
-            <div>${new Date(comment.date)}</div>
+            <div>${dateFormat(new Date(comment.date))}</div>
           </div>
           <div class="comment-body">
             <div class="comment-text" data-index="${index}">
@@ -186,17 +191,21 @@
             text: commentInputElement.value,
             name: nameInputElement.value,
           })
+    }).then(()=> {
+      return fetch("https://wedev-api.sky.pro/api/v1/mikhail-maimakov/comments", {
+      method: "GET"
+      });
     }).then((response) => {
       // Переводим данные от API в json формат
-      response.json().then((responseData) => {
+      return response.json();
+    }).then((responseData) => {
+      console.log(responseData);
         // Получили данные и рендерим
         commentsArray = responseData.comments;
           
         renderList();
       });
-    });
- 
-    
+        
     //Очищаем форму от последнего комментария
     
       nameInputElement.value = '';

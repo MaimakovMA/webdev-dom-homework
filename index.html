@@ -8,11 +8,9 @@
 
   <body>
     <div class="container">
-      <p class="loading_list">Подождите, загружаю комментарии...</p>
       <ul class="comments">
         <!-- Рендерится в JS -->
       </ul>
-      <p class="loading_form hide-elem">Комментарий добавляется...</p>
       <div class="add-form">
         <input
           type="text"
@@ -45,8 +43,7 @@
    const nameInputElement = document.querySelector(".add-form-name");
    const commentInputElement = document.querySelector(".add-form-text");
    const buttonInputElement = document.querySelector(".add-form-button");
-   const loadingListElement = document.querySelector(".loading_list");
-   const loadingFormElement = document.querySelector(".loading_form");
+   
 
 
   
@@ -79,7 +76,7 @@
     let commentsArray = [];
 
     // Запрос API
-    
+    commentsElement.textContent = "Подождите, загружаю комментарии...";
     const fetchPromise = () => {
       return fetch("https://wedev-api.sky.pro/api/v1/mikhail-maimakov/comments", {
       method: "GET"
@@ -96,10 +93,7 @@
       });
     };
 
-    fetchPromise()
-    .then(() => {
-      loadingListElement.classList.add('hide-elem');
-    });
+   
 
 
 
@@ -189,6 +183,9 @@
         formInputElement.classList.add("add__form_error");
         return;
       };   
+
+      formInputElement.disabled = true;
+      formInputElement.textContent = "Комментарий добавляется...";
       
     
 
@@ -207,10 +204,8 @@
       return fetchPromise()
     })
     // Вернули форму
-    .then(() => {
-      formInputElement.classList.remove('hide-elem');
-      loadingFormElement.classList.add('hide-elem');
-      });
+    formInputElement.disabled = false;
+    
         
     //Очищаем форму от последнего комментария
     

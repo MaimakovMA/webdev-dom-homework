@@ -8,9 +8,15 @@
 
   <body>
     <div class="container">
+      <div class="loader_list">
+
+      </div>
       <ul class="comments">
         <!-- Рендерится в JS -->
       </ul>
+      <div class="loader_form">
+
+      </div>
       <div class="add-form">
         <input
           type="text"
@@ -43,6 +49,8 @@
    const nameInputElement = document.querySelector(".add-form-name");
    const commentInputElement = document.querySelector(".add-form-text");
    const buttonInputElement = document.querySelector(".add-form-button");
+   const loaderListElement = document.querySelector('.loader_list');
+   const loaderFormElement = document.querySelector('.loader_form');
    
 
 
@@ -76,7 +84,7 @@
     let commentsArray = [];
 
     // Запрос API
-    commentsElement.textContent = "Подождите, загружаю комментарии...";
+    loaderListElement.textContent = "Подождите, загружаю комментарии...";
     const fetchPromise = () => {
       return fetch("https://wedev-api.sky.pro/api/v1/mikhail-maimakov/comments", {
       method: "GET"
@@ -85,6 +93,9 @@
     // С помощью метода then мы подписываемся на ответ сервера
 
     .then((response) => response.json())
+    .then (() => {
+      loaderListElement.textContent = "";     
+    })
       // Переводим данные от API в json формат
     .then((response) => {
         // Получили данные и рендерим
@@ -184,13 +195,10 @@
         return;
       };   
 
-      formInputElement.disabled = true;
-      formInputElement.textContent = "Комментарий добавляется...";
       
-    
 
     //  Отправляем новый объект на сервер
-
+    loaderFormElement.textContent = "Комментарий добавляется...";
     fetch("https://wedev-api.sky.pro/api/v1/mikhail-maimakov/comments", {
       method: "POST",
       body: JSON.stringify({
@@ -203,8 +211,9 @@
     .then(() => {
       return fetchPromise()
     })
-    // Вернули форму
-    formInputElement.disabled = false;
+    .then (() => {
+      loaderFormElement.textContent = "";     
+    })
     
         
     //Очищаем форму от последнего комментария
@@ -222,6 +231,7 @@
       lastList.remove();
     }); 
 
+    fetchPromise();
     renderList();
 
     // Код писать здесь!

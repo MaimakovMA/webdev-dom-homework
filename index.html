@@ -93,15 +93,18 @@
     // С помощью метода then мы подписываемся на ответ сервера
 
     .then((response) => response.json())
-    .then (() => {
-      loaderListElement.textContent = "";     
+
+    .then ((response) => {
+      loaderListElement.textContent = "";  
+      commentsArray = response.comments
+      renderList();   
     })
-      // Переводим данные от API в json формат
-    .then((response) => {
-        // Получили данные и рендерим
-        commentsArray = response.comments
-        renderList();
-      });
+    //   // Переводим данные от API в json формат
+    // .then((response) => {
+    //     // Получили данные и рендерим
+    //     commentsArray = response.comments
+    //     renderList();
+    //   });
     };
 
    

@@ -105,9 +105,7 @@
     //     commentsArray = response.comments
     //     renderList();
     //   });
-    };
-
-   
+    };   
 
 
 
@@ -207,22 +205,40 @@
       body: JSON.stringify({
             text: commentInputElement.value,
             name: nameInputElement.value,
+            
           })
     })
 
     // Обновленный массив
+    .then((response) => {
+      // Проверяем статус 
+      switch (response.status) {
+        case 400:
+          alert ('Слишком короткое имя и комментарий должны быть не менее 3 символов');
+          throw new Error("Имя должно содержать не менее 3 символов")
+          break;
+        case 500:
+          alert ('Сервер сломался, попробуй позже');
+          throw new Error("Ошибка на сервере")
+          break;
+        default:
+          return fetchPromise();        
+      }
+    })
     .then(() => {
       return fetchPromise()
     })
     .then (() => {
-      loaderFormElement.textContent = "";     
-    })
-    
-        
-    //Очищаем форму от последнего комментария
-    
+      loaderFormElement.textContent = ""; 
+      //Очищаем форму от последнего комментария 
       nameInputElement.value = '';
-      commentInputElement.value = '';
+      commentInputElement.value = '';   
+    })
+    .catch((error) => {
+      loaderFormElement.textContent = "";
+      alert("Нет соединения с интернетом");
+      console.warn(error);
+    }) 
 
   });
 

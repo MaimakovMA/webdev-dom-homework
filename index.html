@@ -90,22 +90,38 @@
       method: "GET"
     })
 
+    .then((response) => {
+    if (response.status === 500) {
+      throw new Error("Ошибка на сервере")
+    } else {
+      return response.json();
+    }
+  })
+
     // С помощью метода then мы подписываемся на ответ сервера
 
-    .then((response) => response.json())
+    // .then((response) => response.json())
 
     .then ((response) => {
       loaderListElement.textContent = "";  
       commentsArray = response.comments
       renderList();   
     })
-    //   // Переводим данные от API в json формат
-    // .then((response) => {
-    //     // Получили данные и рендерим
-    //     commentsArray = response.comments
-    //     renderList();
-    //   });
-    };   
+    
+    .catch((error) => {
+      loaderListElement.textContent = "";       
+            
+      if (error.message === "Ошибка на сервере") {
+        alert("Сервер сломался, попробуй позже");
+        return;
+      }
+
+      console.warn(error);
+    }) 
+
+    };  
+    
+    
 
 
 

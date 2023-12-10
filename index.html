@@ -90,24 +90,38 @@
       method: "GET"
     })
 
+    .then((response) => {
+    if (response.status === 500) {
+      throw new Error("Ошибка на сервере")
+    } else {
+      return response.json();
+    }
+  })
+
     // С помощью метода then мы подписываемся на ответ сервера
 
-    .then((response) => response.json())
+    // .then((response) => response.json())
 
     .then ((response) => {
       loaderListElement.textContent = "";  
       commentsArray = response.comments
       renderList();   
     })
-    //   // Переводим данные от API в json формат
-    // .then((response) => {
-    //     // Получили данные и рендерим
-    //     commentsArray = response.comments
-    //     renderList();
-    //   });
-    };
+    
+    .catch((error) => {
+      loaderListElement.textContent = "";       
+            
+      if (error.message === "Ошибка на сервере") {
+        alert("Сервер сломался, попробуй позже");
+        return;
+      }
 
-   
+      console.warn(error);
+    }) 
+
+    };  
+    
+    
 
 
 
@@ -207,22 +221,48 @@
       body: JSON.stringify({
             text: commentInputElement.value,
             name: nameInputElement.value,
+            forceError: true,
           })
     })
 
     // Обновленный массив
+    .then((response) => {
+      // Проверяем статус 
+      switch (response.status) {
+        case 400:
+          throw new Error("Имя должно содержать не менее 3 символов")
+          break;
+        case 500:
+          throw new Error("Ошибка на сервере")
+          break;
+        default:
+          return fetchPromise();        
+      }
+    })
     .then(() => {
       return fetchPromise()
     })
     .then (() => {
-      loaderFormElement.textContent = "";     
-    })
-    
-        
-    //Очищаем форму от последнего комментария
-    
+      loaderFormElement.textContent = ""; 
+      //Очищаем форму от последнего комментария 
       nameInputElement.value = '';
-      commentInputElement.value = '';
+      commentInputElement.value = '';   
+    })
+    .catch((error) => {
+      loaderFormElement.textContent = "";
+      if (error.message === "Имя должно содержать не менее 3 символов") {
+        alert("Слишком короткое имя и комментарий должны быть не менее 3 символов");
+        return;
+      }
+
+      if (error.message === "Ошибка на сервере") {
+        alert("Сервер сломался, попробуй позже");
+        return;
+      }
+
+
+      console.warn(error);
+    }) 
 
   });
 

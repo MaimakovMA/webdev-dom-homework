@@ -9,40 +9,7 @@
   <body>
     <div class="container">
       <ul class="comments">
-        <li class="comment">
-          <div class="comment-header">
-            <div>Глеб Фокин</div>
-            <div>12.02.22 12:18</div>
-          </div>
-          <div class="comment-body">
-            <div class="comment-text">
-              Это будет первый комментарий на этой странице
-            </div>
-          </div>
-          <div class="comment-footer">
-            <div class="likes">
-              <span class="likes-counter">3</span>
-              <button class="like-button"></button>
-            </div>
-          </div>
-        </li>
-        <li class="comment">
-          <div class="comment-header">
-            <div>Варвара Н.</div>
-            <div>13.02.22 19:22</div>
-          </div>
-          <div class="comment-body">
-            <div class="comment-text">
-              Мне нравится как оформлена эта страница! ❤
-            </div>
-          </div>
-          <div class="comment-footer">
-            <div class="likes">
-              <span class="likes-counter">75</span>
-              <button class="like-button -active-like"></button>
-            </div>
-          </div>
-        </li>
+        <!-- Рендерится в JS -->
       </ul>
       <div class="add-form">
         <input
@@ -77,7 +44,81 @@
    const commentInputElement = document.querySelector(".add-form-text");
    const buttonInputElement = document.querySelector(".add-form-button");
 
-   buttonInputElement.addEventListener("click", () => {
+  //  Создаем массив данных данных с комментариями
+
+    const commentsArray = [
+    {
+        name: "Глеб Фокин",
+        comment: "Это будет первый комментарий на этой странице",
+        likes: 3,
+        date: '12.02.22 12:18',
+        activeLike: false,
+      }, 
+      {
+        name: "Варвара Н.",
+        comment: "Мне нравится как оформлена эта страница! ❤",
+        likes: 75,
+        date: '13.02.22 19:22',
+        activeLike: false,
+      }, 
+    ];
+
+    // Функция при нажатии на лайк
+
+    const likeListeners = () => {
+      const likeElements = document.querySelectorAll(".like-button");
+      for (let like of likeElements) {
+        like.addEventListener("click", () => {
+          const index = like.dataset.index;
+          if (commentsArray[index].activeLike === false) {
+            commentsArray[index].activeLike = true;
+            commentsArray[index].likes++;
+          } else {
+            commentsArray[index].activeLike = false;
+            commentsArray[index].likes--;
+          }
+          renderList();
+        });
+      }
+    };
+
+    // Функия для закрашивания лайка в зависимости от значения activeLike
+    const activeLike = (comment) => {
+        if (comment.activeLike === true) {
+          return '-active-like'
+        } 
+    };
+
+    // Создем рендер списка на основе массива 
+    const renderList = () => {
+      const commentsHtml = commentsArray.map((comment, index) => {
+        return `<li class="comment">
+          <div class="comment-header">
+            <div>${comment.name}</div>
+            <div>${comment.date}</div>
+          </div>
+          <div class="comment-body">
+            <div class="comment-text">
+              ${comment.comment}
+            </div>
+          </div>
+          <div class="comment-footer">
+            <div class="likes">
+              <span class="likes-counter">${comment.likes}</span>
+              <button class="like-button ${activeLike(comment)}" data-index="${index}"></button>
+            </div>
+          </div>
+        </li>`
+      }).join('');
+
+      commentsElement.innerHTML = commentsHtml; 
+      likeListeners();
+    };
+    
+
+    // Функция после клика на кнопку "Написать"
+
+    buttonInputElement.addEventListener("click", () => {
       //Проверка на пустые значения
       formInputElement.classList.remove("add__form_error");
       if (nameInputElement.value.trim() === '' || commentInputElement.value.trim() === '') {
@@ -85,37 +126,41 @@
         return;
       };    
 
-    const oldComments = commentsElement.innerHTML; // Получили HTML списка с комментариями
-    let date = new Date(); // Получили дату
-    let month = date.getMonth() + 1;
-    if (month < 10) {
-      month = "0" + month
-    };
+        
+    // Получили дату
+    
+    let date = new Date(); 
+    
+    let month = date.getMonth() + 1 ;
+      if (month < 10) {
+        month = "0" + month
+      };
 
-    // Добавляем новый комментарий
+    let minutes = date.getMinutes()
+    if (minutes < 10) {
+        minutes = "0" + minutes
+      };
 
-    commentsElement.innerHTML = oldComments +
-    `<li class="comment">
-          <div class="comment-header">
-            <div>${nameInputElement.value}</div>
-            <div>${date.getDate()}.${month}.${date.getFullYear() - 2000} ${date.getHours()}:${date.getMinutes()}</div>
-          </div>
-          <div class="comment-body">
-            <div class="comment-text">
-              ${commentInputElement.value}
-            </div>
-          </div>
-          <div class="comment-footer">
-            <div class="likes">
-              <span class="likes-counter">0</span>
-              <button class="like-button"></button>
-            </div>
-          </div>
-        </li>`;
+    let dateString = `${date.getDate()}.${month}.${date.getFullYear() - 2000} ${date.getHours()}:${minutes}`;
 
-        //Очищаем форму от последнего комментария
+    
+     //Добавили новый объект в массив
+    commentsArray.push({
+      name: nameInputElement.value,
+      comment: commentInputElement.value,
+      likes: 0,
+      date: dateString,
+      activeLike: false,
+    });
+
+
+      //Очищаем форму от последнего комментария
       nameInputElement.value = '';
       commentInputElement.value = '';
+
+      // Рендерим новый список
+
+      renderList();
     });
 
 
@@ -126,8 +171,10 @@
       lastList.remove();
     }); 
 
+    renderList();
+
     // Код писать здесь
-    console.log("It works!");
+    console.log("It works!")
   </script>
 </html>
 
